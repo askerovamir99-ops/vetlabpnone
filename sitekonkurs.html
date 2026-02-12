@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ГосВетЛаб — Super App</title>
+    <meta name="description" content="Ветеринарная клиника будущего. AI-диагностика, запись онлайн.">
+    <meta name="theme-color" content="#ffffff">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* =========================================
+           1. DESIGN SYSTEM & VARIABLES
+           ========================================= */
+        :root {
+            /* Colors: Light Mode */
+            --bg-body: #F2F4F8;
+            --bg-surface: #FFFFFF;
+            --bg-surface-2: #F8FAFC;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            
+            --text-main: #0F172A;
+            --text-secondary: #64748B;
+            --text-tertiary: #94A3B8;
+
+            --primary: #3B82F6;
+            --primary-dark: #2563EB;
+            --primary-light: #EFF6FF;
+            
+            --accent: #10B981;   /* Success/Open */
+            --danger: #EF4444;   /* Error/Closed */
+            --warning: #F59E0B;
+            
+            --border: #E2E8F0;
+            --divider: #F1F5F9;
+
+            /* UI Metrics */
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            
+            --nav-height: 65px;
+            --header-height: 60px;
+            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+            --shadow-up: 0 -4px 20px rgba(0,0,0,0.08);
+
+            --transition: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Colors: Dark Mode */
+        [data-theme="dark"] {
+            --bg-body: #000000;
+            --bg-surface: #111827;
+            --bg-surface-2: #1F2937;
+            --bg-glass: rgba(17, 24, 39, 0.9);
+
+            --text-main: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+
+            --primary: #60A5FA;
+            --primary-dark: #3B82F6;
+            --primary-light: rgba(59, 130, 246, 0.15);
+
+            --border: #1F2937;
+            --divider: #111827;
+        }
+
+        /* =========================================
+           2. RESET & BASE
+           ========================================= */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); transition: background 0.3s ease; scroll-behavior: smooth; }
+        h1, h2, h3, h4, h5 { font-family: 'Space Grotesk', sans-serif; margin: 0; font-weight: 700; line-height: 1.2; }
+        p { margin: 0; line-height: 1.5; color: var(--text-secondary); }
+        a { text-decoration: none; color: inherit; }
+        button { border: none; background: none; cursor: pointer; font-family: inherit; padding: 0; }
+        img { display: block; max-width: 100%; height: auto; object-fit: cover; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        /* Scrollbar hiding */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* =========================================
+           3. LAYOUT UTILITIES
+           ========================================= */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* Mobile Wrapper to simulate app behavior on desktop */
+        .app-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom));
+            position: relative;
+            z-index: 1;
+        }
+
+        /* =========================================
+           4. COMPONENTS
+           ========================================= */
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 48px; padding: 0 24px;
+            border-radius: var(--radius-lg);
+            font-weight: 600; font-size: 15px;
+            transition: transform 0.1s;
+            gap: 8px;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .btn-soft { background: var(--primary-light); color: var(--primary); }
+        .btn-surface { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.2s; }
+        .btn-icon:hover { background: var(--bg-surface-2); }
+
+        /* Cards */
+        .card {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        /* Inputs */
+        .input-group { margin-bottom: 16px; }
+        .input-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-field {
+            width: 100%; height: 50px; padding: 0 16px;
+            border-radius: var(--radius-md);
+            background: var(--bg-surface-2);
+            border: 1px solid transparent;
+            color: var(--text-main);
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .input-field:focus { border-color: var(--primary); background: var(--bg-surface); }
+
+        /* =========================================
+           5. HEADER & HERO (Mobile Optimized)
+           ========================================= */
+        .app-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--header-height);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        .app-header.hidden { transform: translateY(-100%); }
+
+        .logo-wrap { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; }
+        .logo-icon { color: var(--primary); font-size: 24px; }
+        
+        .hero-section {
+            padding: 90px 20px 30px;
+            text-align: left;
+        }
+        .status-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-surface);
+            border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 16px;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-tertiary); }
+        .status-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+        .hero-title { font-size: 36px; line-height: 1.05; margin-bottom: 12px; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 16px; margin-bottom: 24px; max-width: 90%; }
+        
+        /* Compact Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .action-item {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            text-align: center;
+        }
+        .action-btn {
+            width: 60px; height: 60px;
+            background: var(--bg-surface);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            transition: 0.2s;
+        }
+        .action-btn:active { transform: scale(0.9); background: var(--primary-light); }
+        .action-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+
+        /* =========================================
+           6. SERVICES (Horizontal Scroll - Stories Style)
+           ========================================= */
+        .section-header { padding: 0 20px; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+        .section-title { font-size: 20px; }
+        .see-all { font-size: 13px; color: var(--primary); font-weight: 600; }
+
+        .h-scroll-wrapper {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px 20px;
+            gap: 12px;
+            scroll-snap-type: x mandatory;
+        }
+        .service-card-compact {
+            min-width: 140px;
+            background: var(--bg-surface);
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            display: flex; flex-direction: column;
+            scroll-snap-align: start;
+            border: 1px solid var(--border);
+        }
+        .s-icon { 
+            width: 40px; height: 40px; 
+            background: var(--primary-light); color: var(--primary); 
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; 
+        }
+        .s-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .s-price { font-size: 13px; color: var(--text-secondary); }
+
+        /* =========================================
+           7. LIST ITEMS (Blog, etc.)
+           ========================================= */
+        .list-vertical { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+        .list-item {
+            display: flex; gap: 15px;
+            background: var(--bg-surface);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            align-items: center;
+        }
+        .list-thumb { width: 70px; height: 70px; border-radius: 12px; flex-shrink: 0; }
+        .list-content { flex: 1; min-width: 0; } /* min-width for truncate */
+        .list-title { font-size: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-meta { font-size: 12px; color: var(--text-tertiary); display: flex; gap: 10px; }
+
+        /* =========================================
+           8. BOTTOM NAVIGATION
+           ========================================= */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: calc(var(--nav-height) + var(--safe-area-bottom));
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex; justify-content: space-around;
+            padding: 0 10px var(--safe-area-bottom);
+            z-index: 900;
+            transition: transform 0.3s;
+        }
+        .bottom-nav.hidden { transform: translateY(100%); }
+
+        .nav-btn {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 4px; color: var(--text-tertiary);
+            position: relative;
+        }
+        .nav-btn i { font-size: 24px; transition: 0.2s; }
+        .nav-btn span { font-size: 10px; font-weight: 600; }
+        
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn.active i { transform: translateY(-2px); }
+        .nav-btn.active::after {
+            content: ''; position: absolute; top: 0; 
+            width: 40px; height: 3px; 
+            background: var(--primary); 
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 8px var(--primary);
+        }
+
+        /* FAB (Floating Action Button) - Central */
+        .fab-container { position: relative; width: 60px; top: -20px; }
+        .fab {
+            width: 56px; height: 56px;
+            background: var(--primary); /* Solid color fallback */
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 28px;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            border: 4px solid var(--bg-body); /* Fake transparency cutout */
+        }
+        .fab:active { transform: scale(0.95); }
+
+        /* =========================================
+           9. BOTTOM SHEETS (MODALS)
+           ========================================= */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            opacity: 0; visibility: hidden;
+            transition: 0.3s;
+            backdrop-filter: blur(4px);
+        }
+        .overlay.active { opacity: 1; visibility: visible; }
+
+        .sheet {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--bg-surface);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+            max-height: 90vh;
+            display: flex; flex-direction: column;
+            padding-bottom: var(--safe-area-bottom);
+        }
+        .sheet.active { transform: translateY(0); }
+
+        .sheet-drag-handle {
+            width: 40px; height: 5px; background: var(--border);
+            border-radius: 10px; margin: 12px auto; flex-shrink: 0;
+        }
+        .sheet-header {
+            padding: 0 24px 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sheet-content {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Chat Specific */
+        .chat-container { display: flex; flex-direction: column; height: 60vh; }
+        .chat-msgs { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-body); }
+        .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.4; position: relative; }
+        .msg-in { background: var(--bg-surface); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: var(--shadow-sm); }
+        .msg-out { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-input-area { padding: 10px 15px; background: var(--bg-surface); display: flex; gap: 10px; border-top: 1px solid var(--border); }
+
+        /* Settings Toggle */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--divider); }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Age Calc Widget */
+        .widget-age {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white; padding: 20px; border-radius: var(--radius-lg);
+            margin: 0 20px 30px; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .widget-age input { 
+            background: rgba(255,255,255,0.2); border: none; 
+            color: white; width: 60px; text-align: center; 
+            font-size: 20px; padding: 8px; border-radius: 8px; 
+            font-weight: 700;
+        }
+        .widget-age input::placeholder { color: rgba(255,255,255,0.6); }
+
+        @media (min-width: 769px) {
+            /* Desktop Enhancements */
+            .app-wrapper { max-width: 480px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); background: var(--bg-body); box-shadow: 0 0 50px rgba(0,0,0,0.05); min-height: 100vh; }
+            body { background: #eef2f6; display: flex; justify-content: center; }
+            .bottom-nav { position: absolute; max-width: 480px; left: auto; right: auto; border-radius: 0 0 20px 20px; }
+            .sheet { position: absolute; max-width: 480px; left: auto; right: auto; }
+            .app-header { position: absolute; max-width: 480px; left: auto; right: auto; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    
+    <header class="app-header" id="header">
+        <div class="logo-wrap">
+            <i class="ph-fill ph-paw-print logo-icon"></i>
+            <span>ГосВетЛаб</span>
+        </div>
+        <div class="flex-center" style="gap: 10px;">
+            <button class="btn-icon" onclick="lang.toggle()">
+                <span id="langDisplay" style="font-size: 14px; font-weight: 700;">RU</span>
+            </button>
+            <button class="btn-icon" onclick="sheets.open('profileSheet')">
+                <img src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" style="width: 32px; height: 32px; border-radius: 50%;" id="headerAvatar">
+            </button>
+        </div>
+    </header>
+
+    <main style="padding-top: var(--header-height);">
+        
+        <section class="hero-section">
+            <div class="status-chip">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Проверка...</span>
+            </div>
+            <h1 class="hero-title" data-tr="hero_title">Забота о питомце<br><span style="color:var(--primary)">в один клик</span></h1>
+            <p class="hero-subtitle" data-tr="hero_sub">Онлайн запись, результаты анализов и консультации 24/7.</p>
+        
+            <div class="actions-grid">
+                <div class="action-item" onclick="sheets.open('bookingSheet')">
+                    <div class="action-btn"><i class="ph-fill ph-calendar-plus"></i></div>
+                    <span class="action-label" data-tr="act_book">Запись</span>
+                </div>
+                <div class="action-item" onclick="sheets.open('chatSheet')">
+                    <div class="action-btn" style="color: var(--accent);"><i class="ph-fill ph-whatsapp-logo"></i></div>
+                    <span class="action-label" data-tr="act_chat">Чат</span>
+                </div>
+                <div class="action-item" onclick="document.getElementById('servicesSec').scrollIntoView()">
+                    <div class="action-btn" style="color: var(--warning);"><i class="ph-fill ph-list-magnifying-glass"></i></div>
+                    <span class="action-label" data-tr="act_price">Цены</span>
+                </div>
+                <div class="action-item" onclick="sheets.open('mapSheet')">
+                    <div class="action-btn" style="color: var(--danger);"><i class="ph-fill ph-map-pin"></i></div>
+                    <span class="action-label" data-tr="act_map">Адрес</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="servicesSec">
+            <div class="section-header">
+                <h3 class="section-title" data-tr="sec_serv">Услуги</h3>
+                <span class="see-all" onclick="sheets.open('bookingSheet')" data-tr="btn_all">Все</span>
+            </div>
+            <div class="h-scroll-wrapper hide-scroll" id="servicesList">
+                </div>
+        </section>
+
+        <div class="widget-age">
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 4px;" data-tr="age_title">Возраст питомца</h3>
+                <div style="font-size: 12px; opacity: 0.9;">16 × ln(age) + 31</div>
+            </div>
+            <div style="text-align: right;">
+                <input type="number" placeholder="5" id="ageInput" oninput="app.calcAge()">
+                <div style="margin-top: 5px; font-weight: 700; font-size: 14px;">= <span id="humanAge">0</span> <span data-tr="age_res">лет</span></div>
+            </div>
+            <i class="ph-duotone ph-calculator" style="position: absolute; right: -10px; bottom: -20px; font-size: 80px; opacity: 0.2;"></i>
+        </div>
+
+        <section style="margin-bottom: 20px;">
+            <div class="section-header">
+                <h3 class="section-title" data-tr="sec_blog">Полезное</h3>
+            </div>
+            <div class="list-vertical" id="blogList">
+                </div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="#" class="nav-btn active" onclick="nav.to(this, 'home')">
+            <i class="ph-fill ph-house"></i> <span data-tr="nav_home">Главная</span>
+        </a>
+        <a href="#" class="nav-btn" onclick="nav.to(this, 'history')">
+            <i class="ph-fill ph-clock-counter-clockwise"></i> <span data-tr="nav_hist">История</span>
+        </a>
+        
+        <div class="fab-container" onclick="sheets.open('chatSheet')">
+            <div class="fab"><i class="ph-fill ph-chat-teardrop-text"></i></div>
+        </div>
+
+        <a href="#" class="nav-btn" onclick="nav.to(this, 'notif')">
+            <i class="ph-fill ph-bell"></i> <span data-tr="nav_notif">Уведомл.</span>
+        </a>
+        <a href="#" class="nav-btn" onclick="sheets.open('profileSheet')">
+            <i class="ph-fill ph-user"></i> <span data-tr="nav_prof">Профиль</span>
+        </a>
+    </nav>
+</div>
+
+<div class="overlay" id="overlay" onclick="sheets.closeAll()"></div>
+
+<div class="sheet" id="chatSheet" style="height: 80vh;">
+    <div class="sheet-drag-handle"></div>
+    <div class="sheet-header">
+        <h3>AI Помощник</h3>
+        <button onclick="sheets.closeAll()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="chat-container">
+        <div class="chat-msgs hide-scroll" id="chatBox">
+            <div class="msg-bubble msg-in">Привет! Я AI-ассистент ГосВетЛаб. Спросите про цены, запись или уход за питомцем. 🐶</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="input-field" id="chatInput" placeholder="Сообщение..." style="height: 40px; font-size: 14px;">
+            <button class="btn-primary" style="width: 40px; height: 40px; border-radius: 50%;" onclick="chat.send()"><i class="ph-fill ph-paper-plane-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="sheet" id="bookingSheet">
+    <div class="sheet-drag-handle"></div>
+    <div class="sheet-header">
+        <h3 data-tr="book_title">Новая запись</h3>
+        <button onclick="sheets.closeAll()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="sheet-content">
+        <div class="input-group">
+            <label class="input-label" data-tr="lbl_service">Услуга</label>
+            <select class="input-field" id="bookService">
+                <option value="Осмотр">Осмотр (3000 ₸)</option>
+                <option value="Вакцинация">Вакцинация (5000 ₸)</option>
+                <option value="УЗИ">УЗИ (4000 ₸)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label class="input-label" data-tr="lbl_date">Дата</label>
+            <input type="date" class="input-field" id="bookDate">
+        </div>
+        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="booking.submit()" data-tr="btn_confirm">Подтвердить</button>
+    </div>
+</div>
+
+<div class="sheet" id="profileSheet">
+    <div class="sheet-drag-handle"></div>
+    <div class="sheet-header">
+        <h3 data-tr="prof_title">Настройки</h3>
+        <button onclick="sheets.closeAll()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="sheet-content">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 80px; height: 80px; background: var(--primary-light); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: var(--primary);">
+                <i class="ph-fill ph-user"></i>
+            </div>
+            <input type="text" id="profileNameInput" value="Гость" style="text-align: center; border: none; background: transparent; font-size: 20px; font-weight: 700; width: 100%;" onchange="profile.save()">
+            <p style="font-size: 13px;" data-tr="prof_sub">Нажмите на имя чтобы изменить</p>
+        </div>
+
+        <div class="toggle-row">
+            <span style="font-weight: 500;">Dark Mode</span>
+            <label class="switch">
+                <input type="checkbox" id="themeToggle" onchange="app.toggleTheme()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div class="toggle-row">
+            <span style="font-weight: 500;" data-tr="lbl_notif">Уведомления</span>
+            <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <button class="btn btn-soft" style="width: 100%; margin-top: 20px; color: var(--danger);" onclick="localStorage.clear(); location.reload();">
+            <i class="ph-bold ph-sign-out"></i> Сброс данных
+        </button>
+    </div>
+</div>
+
+<div class="sheet" id="mapSheet" style="height: 60vh;">
+    <div class="sheet-drag-handle"></div>
+    <div class="sheet-content" style="padding: 0;">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2906.776092873216!2d76.9095!3d43.2385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDE0JzE4LjYiTiA3NsKwNTQnMzQuMiJF!5e0!3m2!1sen!2skz!4v1600000000000!5m2!1sen!2skz" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+</div>
+
+<script>
+    // ================= DATA & TRANSLATIONS =================
+    const db = {
+        ru: {
+            hero_title: "Забота о питомце<br><span style='color:var(--primary)'>в один клик</span>",
+            hero_sub: "Онлайн запись и консультации 24/7.",
+            status_open: "Сейчас открыто", status_closed: "Сейчас закрыто",
+            act_book: "Запись", act_chat: "Чат", act_price: "Цены", act_map: "Адрес",
+            sec_serv: "Популярные услуги", btn_all: "Все",
+            sec_blog: "Полезное",
+            nav_home: "Главная", nav_hist: "Записи", nav_notif: "Инфо", nav_prof: "Профиль",
+            book_title: "Новая запись", lbl_service: "Выберите услугу", lbl_date: "Выберите дату", btn_confirm: "Записаться",
+            prof_title: "Профиль", prof_sub: "Нажмите на имя для изменения", lbl_notif: "Уведомления",
+            age_title: "Возраст питомца", age_res: "чел. лет"
+        },
+        kz: {
+            hero_title: "Үй жануарыңызға<br><span style='color:var(--primary)'>қамқорлық</span>",
+            hero_sub: "Онлайн жазылу және 24/7 кеңес.",
+            status_open: "Қазір ашық", status_closed: "Қазір жабық",
+            act_book: "Жазылу", act_chat: "Чат", act_price: "Баға", act_map: "Мекенжай",
+            sec_serv: "Қызметтер", btn_all: "Бәрі",
+            sec_blog: "Пайдалы",
+            nav_home: "Басты", nav_hist: "Тарих", nav_notif: "Ақпарат", nav_prof: "Профиль",
+            book_title: "Жаңа жазба", lbl_service: "Қызметті таңдаңыз", lbl_date: "Күнді таңдаңыз", btn_confirm: "Растау",
+            prof_title: "Профиль", prof_sub: "Атын өзгерту үшін басыңыз", lbl_notif: "Хабарламалар",
+            age_title: "Жануар жасы", age_res: "адам жасымен"
+        },
+        services: [
+            { name_ru: "Осмотр", name_kz: "Тексеру", price: "3000 ₸", icon: "ph-stethoscope" },
+            { name_ru: "Вакцина", name_kz: "Вакцина", price: "5000 ₸", icon: "ph-syringe" },
+            { name_ru: "УЗИ", name_kz: "УЗИ", price: "4000 ₸", icon: "ph-wave-sawtooth" },
+            { name_ru: "Зубы", name_kz: "Тіс емдеу", price: "6000 ₸", icon: "ph-tooth" },
+            { name_ru: "Хирург", name_kz: "Хирург", price: "15000 ₸", icon: "ph-scalpel" }
+        ],
+        blog: [
+            { title_ru: "Как выбрать корм?", title_kz: "Жемді қалай таңдау керек?", img: "https://images.unsplash.com/photo-1589924691195-41432c84c161?auto=format&fit=crop&w=100&q=80", tag: "Питание" },
+            { title_ru: "График прививок", title_kz: "Екпе кестесі", img: "https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?auto=format&fit=crop&w=100&q=80", tag: "Здоровье" },
+            { title_ru: "Клещи: защита", title_kz: "Кенелерден қорғау", img: "https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?auto=format&fit=crop&w=100&q=80", tag: "Сезонное" }
+        ]
+    };
+
+    // ================= STATE & UTILS =================
+    const state = {
+        lang: 'ru',
+        theme: localStorage.getItem('theme') || 'light'
+    };
+
+    // ================= APP CONTROLLER =================
+    const app = {
+        init() {
+            // Apply theme immediately
+            document.body.setAttribute('data-theme', state.theme);
+            document.getElementById('themeToggle').checked = state.theme === 'dark';
+
+            // Initial Renders
+            this.renderText();
+            this.renderServices();
+            this.renderBlog();
+            this.checkStatus();
+            profile.load();
+
+            // Setup Header Scroll
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const current = window.pageYOffset;
+                const header = document.getElementById('header');
+                const nav = document.getElementById('bottomNav');
+                
+                if (current > 50 && current > lastScroll) {
+                    header.classList.add('hidden');
+                    nav.classList.add('hidden');
+                } else {
+                    header.classList.remove('hidden');
+                    nav.classList.remove('hidden');
+                }
+                lastScroll = current;
+            });
+            
+            // Set default date
+            document.getElementById('bookDate').valueAsDate = new Date();
+        },
+
+        toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', state.theme);
+            localStorage.setItem('theme', state.theme);
+        },
+
+        renderText() {
+            const t = db[state.lang];
+            document.querySelectorAll('[data-tr]').forEach(el => {
+                const key = el.getAttribute('data-tr');
+                if(t[key]) el.innerHTML = t[key];
+            });
+            document.getElementById('langDisplay').innerText = state.lang.toUpperCase();
+            this.checkStatus();
+        },
+
+        renderServices() {
+            const box = document.getElementById('servicesList');
+            box.innerHTML = db.services.map(s => `
+                <div class="service-card-compact" onclick="sheets.open('bookingSheet')">
+                    <div class="s-icon"><i class="ph-fill ${s.icon}"></i></div>
+                    <div class="s-title">${state.lang==='ru'?s.name_ru:s.name_kz}</div>
+                    <div class="s-price">${s.price}</div>
+                </div>
+            `).join('');
+        },
+
+        renderBlog() {
+            const box = document.getElementById('blogList');
+            box.innerHTML = db.blog.map(b => `
+                <div class="list-item">
+                    <img src="${b.img}" class="list-thumb">
+                    <div class="list-content">
+                        <div style="font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase;">${b.tag}</div>
+                        <div class="list-title">${state.lang==='ru'?b.title_ru:b.title_kz}</div>
+                        <div class="list-meta">5 мин чтение • Сегодня</div>
+                    </div>
+                    <i class="ph-bold ph-caret-right" style="color:var(--border);"></i>
+                </div>
+            `).join('');
+        },
+
+        checkStatus() {
+            const h = new Date().getHours();
+            const isOpen = h >= 8 && h < 22;
+            const dot = document.getElementById('statusDot');
+            const txt = document.getElementById('statusText');
+            
+            if(isOpen) {
+                dot.className = 'status-dot active';
+                txt.innerText = db[state.lang].status_open;
+            } else {
+                dot.className = 'status-dot';
+                txt.style.backgroundColor = 'var(--danger)';
+                txt.innerText = db[state.lang].status_closed;
+            }
+        },
+
+        calcAge() {
+            const v = document.getElementById('ageInput').value;
+            const r = document.getElementById('humanAge');
+            if(v > 0) r.innerText = Math.round(16 * Math.log(v) + 31);
+            else r.innerText = 0;
+        }
+    };
+
+    // ================= LANGUAGE =================
+    const lang = {
+        toggle() {
+            state.lang = state.lang === 'ru' ? 'kz' : 'ru';
+            app.renderText();
+            app.renderServices();
+            app.renderBlog();
+        }
+    };
+
+    // ================= SHEETS / MODALS =================
+    const sheets = {
+        open(id) {
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById(id).classList.add('active');
+            // Haptic feedback pattern if supported
+            if(navigator.vibrate) navigator.vibrate(5);
+        },
+        closeAll() {
+            document.getElementById('overlay').classList.remove('active');
+            document.querySelectorAll('.sheet').forEach(s => s.classList.remove('active'));
+        }
+    };
+
+    // ================= NAVIGATION =================
+    const nav = {
+        to(el, page) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            
+            if(page === 'home') window.scrollTo({top: 0, behavior: 'smooth'});
+            if(page === 'notif') alert(state.lang === 'ru' ? 'Нет новых уведомлений' : 'Жаңа хабарламалар жоқ');
+            // History would load a different view logic
+        }
+    };
+
+    // ================= CHAT =================
+    const chat = {
+        send() {
+            const inp = document.getElementById('chatInput');
+            const txt = inp.value.trim();
+            if(!txt) return;
+
+            this.addMsg(txt, 'msg-out');
+            inp.value = '';
+
+            // Simulated AI typing delay
+            setTimeout(() => {
+                let reply = "";
+                const low = txt.toLowerCase();
+                if(low.includes('цен') || low.includes('price') || low.includes('баға'))
+                    reply = state.lang === 'ru' 
+                        ? "Осмотр: 3000₸<br>Вакцина: 5000₸<br>Хирургия: от 15000₸" 
+                        : "Тексеру: 3000₸<br>Вакцина: 5000₸";
+                else if(low.includes('запис') || low.includes('book'))
+                    reply = state.lang === 'ru' ? "Нажмите кнопку 'Запись' на главном экране." : "'Жазылу' түймесін басыңыз.";
+                else
+                    reply = state.lang === 'ru' ? "Я пока учусь. Позвоните нам: +7 (777) 123-45-67" : "Мен әлі үйренудемін. Бізге хабарласыңыз: +7 (777) 123-45-67";
+                
+                this.addMsg(reply, 'msg-in');
+            }, 800);
+        },
+        addMsg(txt, cls) {
+            const box = document.getElementById('chatBox');
+            const d = document.createElement('div');
+            d.className = `msg-bubble ${cls}`;
+            d.innerHTML = txt;
+            box.appendChild(d);
+            box.scrollTop = box.scrollHeight;
+        }
+    };
+
+    // ================= BOOKING =================
+    const booking = {
+        submit() {
+            sheets.closeAll();
+            const date = document.getElementById('bookDate').value;
+            const srv = document.getElementById('bookService').value;
+            
+            // SweetAlert style native fallback
+            const msg = state.lang === 'ru' 
+                ? `✅ Запись подтверждена!\nУслуга: ${srv}\nДата: ${date}` 
+                : `✅ Жазылу расталды!\nҚызмет: ${srv}\nКүн: ${date}`;
+            
+            setTimeout(() => alert(msg), 300);
+        }
+    };
+
+    // ================= PROFILE =================
+    const profile = {
+        load() {
+            const name = localStorage.getItem('userName') || (state.lang === 'ru' ? 'Гость' : 'Қонақ');
+            document.getElementById('profileNameInput').value = name;
+        },
+        save() {
+            const val = document.getElementById('profileNameInput').value;
+            localStorage.setItem('userName', val);
+        }
+    };
+
+    // Init App
+    window.addEventListener('DOMContentLoaded', () => app.init());
+
+</script>
+</body>
+</html>
